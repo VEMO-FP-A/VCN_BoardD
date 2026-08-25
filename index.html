@@ -490,7 +490,7 @@ footer.foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--b);font-
   <div class="header">
     <div>
       <div class="title">VCN — <b>Executive Summary</b></div>
-      <div class="subtitle">Full History · VCN Charging Network · Financial &amp; Operational · Board Version  ·  <span id="data-through-label" style="color:var(--teal);font-weight:700"></span></div>
+      <div class="subtitle">VCN Charging Network · Financial &amp; Operational  ·  <span id="data-through-label" style="color:var(--teal);font-weight:700"></span></div>
     </div>
     <div class="brand">
       <div class="vemo-logo-wrap">
@@ -1938,8 +1938,7 @@ function renderRatioExpandable(targetId, list, sectionTitle){
   const tgt=document.getElementById(targetId); if(!tgt) return;
   const RS = rangeStart(), RE = rangeEnd();
   let html = sectionTitle ? ('<div class="vemo-section-title">'+sectionTitle+'</div>') : '';
-  const hint = mlblShort(RS)+' → '+mlblShort(RE)+' · '+(KPI_RANGE==='ytd'?'YTD '+CURY:'Histórico completo')+' · clic en sección para expandir';
-  html += '<div class="opmet-wrap"><div class="opmet-hd"><span class="t">Metrics Table</span><span class="hint">'+hint+'</span></div>';
+  html += '<div class="opmet-wrap"><div class="opmet-hd"><span class="t">Metrics Table</span></div>';
   list.forEach((ki, idx)=>{
     const A=arrCand(ki.keys), B=barrCand(ki.keys);
     if(!A.length){ return; }
