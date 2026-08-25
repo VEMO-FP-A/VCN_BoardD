@@ -531,7 +531,7 @@ footer.foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--b);font-
   <div class="vemo-section-title" style="margin-top:28px">EBITDA <b>vs Budget</b> Bridge</div>
   <div class="chart-card" style="margin-bottom:22px">
     <div class="chart-hd">
-      <span class="t">Budget EBITDA → Actual EBITDA · <span id="ebridge-period"></span></span>
+      <span class="t">Budget EBITDA → Actual EBITDA · <span id="ebridge-period"></span> · <span id="ebridge-variance"></span></span>
       <div class="chart-toggles">
         <label><input type="radio" name="ebridge-mode" value="cur" checked> Current month</label>
         <label><input type="radio" name="ebridge-mode" value="ytd"> YTD</label>
@@ -2813,6 +2813,16 @@ function renderEbitdaBridge(){
   const lbl = isYTD ? mlbl(YTD_START)+' → '+mlbl(YTD_END) : mlbl(CUR);
   const periodEl = document.getElementById('ebridge-period');
   if(periodEl) periodEl.textContent = lbl;
+
+  // Total variance label (green = favorable vs budget, red = unfavorable)
+  const varEl = document.getElementById('ebridge-variance');
+  if(varEl){
+    const totalVar = actE - budE;
+    const sign = totalVar >= 0 ? '+' : '−';
+    varEl.textContent = 'Total variance: ' + sign + fmtMm(Math.abs(totalVar)) + 'M';
+    varEl.style.color = totalVar >= 0 ? '#117A45' : '#C0392B';
+    varEl.style.fontWeight = '700';
+  }
 }
 (function(){
   function bind(){
