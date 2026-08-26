@@ -556,7 +556,7 @@ footer.foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--b);font-
 
 <footer class="foot">
   <div>VEMO · VCN · Strictly Private &amp; Confidential</div>
-  <div>build 2026-08-25 20:46</div>
+  <div>build 2026-08-26 02:59</div>
 </footer>
 
 <script>
@@ -583,6 +583,15 @@ const MONTHLY_HL = {"Jan-26": {"highlights": [{"title": "Utilization", "body": "
 
 /* ============ Helpers ============ */
 const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+// Chronological sort key for 'MMM-YY' labels (e.g. 'Jan-26') used by H&L / P&L commentary
+// month dropdowns -- plain string sort put them in alphabetical-by-name order (Apr, Feb, Jan...)
+// instead of calendar order, which is the bug behind the out-of-order Select Month list.
+function hlMonthKey(m){
+  const parts = String(m).split('-');
+  const mi = MN.indexOf(parts[0]);
+  const yy = parseInt(parts[1], 10);
+  return (isNaN(yy) ? 0 : yy) * 12 + (mi >= 0 ? mi : 0);
+}
 
 function mlbl(idx){
   if(idx==null||idx<0||!D.months[idx]) return '—';
@@ -5416,7 +5425,7 @@ function renderMonthlyHL(){
       const d = MONTHLY_HL[k];
       return d && ((d.highlights && d.highlights.length > 0) || (d.lowlights && d.lowlights.length > 0));
     });
-    months.sort(); months.reverse(); // most recent first
+    months.sort((a,b)=>hlMonthKey(b)-hlMonthKey(a)); // most recent first, chronological (not alphabetical)
     sel.innerHTML = months.map(m=>'<option value="'+m+'">'+m+'</option>').join('');
     // Default to most recent month that has actual H&L data (highlights or lowlights populated)
     const hlDefault = months.find(function(m){
@@ -5468,7 +5477,7 @@ function renderPLCommentary(){
     const sel=document.getElementById('pl-comm-month');
     if(!sel) return;
     const months=Object.keys(MONTHLY_HL).filter(k=>!k.startsWith('_'));
-    months.reverse();
+    months.sort((a,b)=>hlMonthKey(b)-hlMonthKey(a)); // most recent first, chronological (not alphabetical)
     sel.innerHTML=months.map(m=>'<option value="'+m+'">'+m+'</option>').join('');
     if(months.length) sel.value=months[0];
     sel.addEventListener('change',renderPLCommentary);
