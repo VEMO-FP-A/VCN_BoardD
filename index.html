@@ -393,58 +393,6 @@ footer.foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--b);font-
 </head>
 <body>
 
-<!-- ============ ACCESS GATE (candado por codigo) ============ -->
-<div id="access-gate" style="position:fixed;inset:0;z-index:100000;background:linear-gradient(135deg,#1F5454,#0f3b3b);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif">
-  <div style="background:#fff;border-radius:16px;padding:38px 40px;box-shadow:0 20px 60px rgba(0,0,0,0.4);max-width:380px;width:90%;text-align:center">
-    <div style="font-size:34px;margin-bottom:6px">🔒</div>
-    <div style="font-size:19px;font-weight:800;color:#1F5454;letter-spacing:0.02em">VCN — Executive Summary</div>
-    <div style="font-size:12px;color:#888;margin:8px 0 20px">Enter the access code to continue.</div>
-    <input id="access-input" type="password" autocomplete="off" placeholder="Access code"
-      style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid #cfe0e0;border-radius:9px;font-size:14px;font-family:inherit;text-align:center;letter-spacing:0.05em;outline:none" />
-    <div id="access-error" style="color:#C0392B;font-size:11.5px;font-weight:600;height:16px;margin-top:8px"></div>
-    <button id="access-btn"
-      style="margin-top:6px;width:100%;padding:12px;border:none;border-radius:9px;background:#11ABAB;color:#fff;font-size:14px;font-weight:700;font-family:inherit;letter-spacing:0.03em;cursor:pointer">Unlock</button>
-    <div style="font-size:9.5px;color:#b8c1c8;margin-top:14px">VEMO · Strictly Private &amp; Confidential</div>
-  </div>
-</div>
-<script>
-(function(){
-  var GATE_HASH="0f230b7f78070d6fef3880ad0c4f1e504612e5b3d4cf1cc43d31e5b76defa31c";
-  var SKEY="dae-access-ok";
-  var gate=document.getElementById('access-gate');
-  var input=document.getElementById('access-input');
-  var errEl=document.getElementById('access-error');
-  var btn=document.getElementById('access-btn');
-  try{ document.documentElement.style.overflow='hidden'; document.body.style.overflow='hidden'; }catch(e){}
-  function unlock(){
-    try{ document.documentElement.style.overflow=''; document.body.style.overflow=''; }catch(e){}
-    if(gate && gate.parentNode) gate.parentNode.removeChild(gate);
-  }
-  try{ if(sessionStorage.getItem(SKEY)==='1'){ unlock(); return; } }catch(e){}
-  async function sha256hex(str){
-    try{
-      var buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
-    }catch(e){ return null; }
-  }
-  async function check(){
-    var code=(input.value||'').trim();
-    if(!code){ errEl.textContent='Enter a code.'; return; }
-    var h=await sha256hex(code);
-    if(h && h===GATE_HASH){
-      try{ sessionStorage.setItem(SKEY,'1'); }catch(e){}
-      unlock();
-    } else {
-      errEl.textContent='Incorrect code. Try again.';
-      input.value=''; input.focus();
-    }
-  }
-  if(btn) btn.addEventListener('click', check);
-  if(input) input.addEventListener('keydown', function(e){ if(e.key==='Enter') check(); });
-  if(input){ try{ input.focus(); }catch(e){} }
-})();
-</script>
-
 <div class="ribbon"><span>VEMO Monthly Financial Review</span></div>
 <div class="ribbon-bot"><span>Strictly Private &amp; Confidential</span></div>
 
@@ -556,7 +504,7 @@ footer.foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--b);font-
 
 <footer class="foot">
   <div>VEMO · VCN · Strictly Private &amp; Confidential</div>
-  <div>build 2026-09-23 17:34</div>
+  <div>build 2026-09-23 23:36</div>
 </footer>
 
 <script>
