@@ -504,7 +504,7 @@ footer.foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--b);font-
 
 <footer class="foot">
   <div>VEMO · VCN · Strictly Private &amp; Confidential</div>
-  <div>build 2026-09-23 17:42</div>
+  <div>build 2026-09-23 19:00</div>
 </footer>
 
 <script>
@@ -1542,16 +1542,16 @@ function renderPLVemo(targetId, opts){
 const RATIOS = {
   main: KPI13,  // KPIs principales del Executive Summary
   financial: [
-    {l:'Revenue',       keys:['revenue'],             unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'up'},
-    {l:'COGS',          keys:['cogs_total'],           unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'down'},
-    {l:'Opex',          keys:['opex'],                 unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'down'},
-    {l:'Gross Profit',  keys:['gross_profit'],         unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'up'},
-    {l:'SG&A',          keys:['corporate_expenses'],   unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'down'},
-    {l:'EBITDA',        keys:['ebitda'],               unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'up'},
-    {l:'D&A',           keys:['da'],                   unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'down'},
-    {l:'EBIT',          keys:['ebit'],                 unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'up'},
-    {l:'Interest Exp.', keys:['interest_expense'],     unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'down'},
-    {l:'Net Income',    keys:['net_income'],           unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'up'},
+    {l:'Revenue',       keys:['revenue'],             unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'up', ytdSum:true},
+    {l:'COGS',          keys:['cogs_total'],           unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'down', ytdSum:true},
+    {l:'Opex',          keys:['opex'],                 unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'down', ytdSum:true},
+    {l:'Gross Profit',  keys:['gross_profit'],         unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'up', ytdSum:true},
+    {l:'SG&A',          keys:['corporate_expenses'],   unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'down', ytdSum:true},
+    {l:'EBITDA',        keys:['ebitda'],               unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'up', ytdSum:true},
+    {l:'D&A',           keys:['da'],                   unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'down', ytdSum:true},
+    {l:'EBIT',          keys:['ebit'],                 unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'up', ytdSum:true},
+    {l:'Interest Exp.', keys:['interest_expense'],     unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'down', ytdSum:true},
+    {l:'Net Income',    keys:['net_income'],           unit:'MXNm', type:'num', agg:'sum', fmt:'mm', better:'up', ytdSum:true},
   ],
   net_kpi: [
     // Main Network KPIs (screenshot 2)
@@ -1922,16 +1922,21 @@ function renderRatioExpandable(targetId, list, sectionTitle){
       }
       return v;
     }
+    // Financial metrics (RATIOS.financial, marcadas con ytdSum): el YTD es la SUMA
+    // de los meses del rango, NO el promedio mensual.
+    // El resto de metricas sigue exactamente igual que antes.
     function getYtd(arrIn){
       let v;
       if(ki.agg==='eop') v = eop(arrIn, RE);
       else if(ki.agg==='avg') v = avg(arrIn, RS, RE);
+      else if(ki.ytdSum) v = sum(arrIn, RS, RE);
       else { const m=RE-RS+1; v = m>0? sum(arrIn,RS,RE)/m : 0; }
       if(ki.add){
         for(const k2 of ki.add){
           const A2 = D[k2]||[];
           if(ki.agg==='eop') v += eop(A2, RE);
           else if(ki.agg==='avg') v += avg(A2, RS, RE);
+          else if(ki.ytdSum) v += sum(A2, RS, RE);
           else { const m=RE-RS+1; v += m>0? sum(A2,RS,RE)/m : 0; }
         }
       }
@@ -1966,7 +1971,10 @@ function renderRatioExpandable(targetId, list, sectionTitle){
     if(rowRS > RE) rowRS = RS; // sin data en todo el rango — no recortar (evita tabla vacia)
     let monthsCols = '<tr><th>Concepto</th>';
     for(let i=rowRS; i<=RE; i++) monthsCols += '<th>'+mlblShort(i)+'</th>';
-    monthsCols += '<th>'+(KPI_RANGE==='ytd'?'YTD':'Total')+'</th></tr>';
+    // "(avg)": el acumulado de esta metrica es un PROMEDIO mensual (mismas reglas que getYtd).
+    // Financial metrics (ytdSum / ytdNum-ytdDen) y saldos EoP no llevan la aclaracion.
+    const _ytdAvg = !(ki.ytdNum && ki.ytdDen) && ki.agg!=='eop' && (ki.agg==='avg' || !ki.ytdSum);
+    monthsCols += '<th>'+(KPI_RANGE==='ytd'?'YTD':'Total')+(_ytdAvg?' (avg)':'')+'</th></tr>';
     let actualRow = '<tr><td><b>Actual</b> ('+ki.unit+')</td>';
     for(let i=rowRS; i<=RE; i++) actualRow += '<td>'+fmtVal(getV(A,i),ki)+'</td>';
     actualRow += '<td><b>'+fmtVal(getYtd(A),ki)+'</b></td></tr>';
